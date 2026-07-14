@@ -37,7 +37,7 @@ jobs:
                    rules/identity/mail_forwarding_rule_created.yml rules/identity/super_admin_role_granted.yml \
                    rules/endpoint/suspicious_encoded_powershell.yml rules/endpoint/edr_agent_tampering.yml; do
             echo "Converting $f"
-            sigma convert -t elasticsearch -p ecs_windows "$f" || echo "::warning::Conversion check failed for $f — review backend/pipeline mapping"
+            sigma convert -t lucene -p ecs_windows "$f" || echo "::warning::Conversion check failed for $f — review backend/pipeline mapping"
           done
 
       - name: Run detection unit tests
