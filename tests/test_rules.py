@@ -87,12 +87,11 @@ def _match_field(event: dict, field_expr: str, expected) -> bool:
 def _eval_selection(event: dict, selection: dict) -> bool:
     return all(_match_field(event, field, expected) for field, expected in selection.items())
 
-
 def _eval_condition(event: dict, detection: dict) -> bool:
     """
     Very small condition evaluator: supports 'selection', 'selection and not X',
-    'A or B' across named selection blocks. Sufficient for the rules in this
-    repo; not a general Sigma condition parser.
+    'selection and not (A or B)', and 'A or B' across named selection blocks.
+    Sufficient for the rules in this repo; not a general Sigma condition parser.
     """
     condition = detection["condition"]
     selections = {k: v for k, v in detection.items() if k != "condition"}
@@ -104,15 +103,27 @@ def _eval_condition(event: dict, detection: dict) -> bool:
 
     if " and not " in condition:
         left, right = condition.split(" and not ")
-        return _eval_selection(event, selections[left.strip()]) and not _eval_selection(
-            event, selections[right.strip()]
+        left = left.strip()
+        right = right.strip()
+
+        # 'selection and not (A or B)' — right side is a parenthesized OR
+        # of named selection blocks, e.g. "(filter_first_party_google or filter_known_good)"
+        if right.startswith("(") and right.endswith(")"):
+            inner = right[1:-1]
+            or_parts = [p.strip() for p in inner.split(" or ")]
+            excluded = any(_eval_selection(event, selections[p]) for p in or_parts)
+            return _eval_selection(event, selections[left]) and not excluded
+
+        # 'selection and not X' — right side is a single named selection block
+        return _eval_selection(event, selections[left]) and not _eval_selection(
+            event, selections[right]
         )
+
     if " or " in condition:
         parts = [p.strip() for p in condition.split(" or ")]
         return any(_eval_selection(event, selections[p]) for p in parts)
 
     return _eval_selection(event, selections[condition.strip()])
-
 
 @pytest.mark.parametrize("rule_path,fixture_name", RULE_FIXTURE_PAIRS)
 def test_rule_fires_on_true_positive_and_not_on_false_positive(rule_path, fixture_name):
