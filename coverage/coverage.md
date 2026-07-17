@@ -12,8 +12,8 @@ documenting the gaps is what makes them trustworthy.
 | T1550 / T1528 — OAuth Token Abuse | Persistence | `new_oauth_app_authorized` | Google Workspace token/authorize events | High — tuned against real production data; first-party Google clients now excluded |
 | T1114.003 — Email Forwarding Rule | Collection | `mail_forwarding_rule_created` | Google Workspace Gmail settings events | High |
 | T1098 — Account Manipulation | Persistence, Privilege Escalation | `super_admin_role_granted` | Google Workspace admin audit log | High |
-| T1059.001 — PowerShell | Execution | `suspicious_encoded_powershell` | Windows process creation (Sysmon Event ID 1 or endpoint EDR telemetry) | Medium — attackers can obfuscate beyond these patterns |
-| T1562.001 — Disable or Modify Tools | Defense Evasion | `edr_agent_tampering` | Windows process creation with EDR service/process names | High for this specific EDR; needs updating if EDR vendor changes |
+| T1059.001 — PowerShell | Execution | `suspicious_encoded_powershell` | Windows process creation (Sysmon Event ID 1 or endpoint EDR telemetry) | Medium — deployed and live-fire verified in Wazuh; still signature-based, attackers can obfuscate beyond these patterns. See runbooks/wazuh-deployment-notes.md. |
+| T1562.001 — Disable or Modify Tools | Defense Evasion | `edr_agent_tampering` | Windows process creation with EDR service/process names | High — deployed and live-fire verified in Wazuh; needs updating if EDR vendor changes. See runbooks/wazuh-deployment-notes.md. |
 
 ## Known blind spots (as of this version)
 

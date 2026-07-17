@@ -89,6 +89,13 @@ For that, each rule should be validated by:
 This two-step validation (CI unit test + Atomic Red Team live fire) is
 the standard this repo aims for as it grows.
 
+Both endpoint rules (`suspicious_encoded_powershell`, `edr_agent_tampering`)
+have already gone through exactly this process against a real Wazuh
+deployment — see `runbooks/wazuh-deployment-notes.md` for what broke,
+what was learned, and how it was fixed. It's a more honest and more
+useful account of "detection engineering" than a rule that has only
+ever been checked against its own synthetic fixture.
+
 ## Known limitations
 
 See `coverage/coverage.md` for the full, honest list — no lateral
